@@ -15,9 +15,5 @@ function AppContent() {
 }
 
 export default function Page() {
-  return (
-    <AppProvider>
-      <AppContent />
-    </AppProvider>
-  )
+  return <AppContent />
 }

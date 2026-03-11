@@ -15,6 +15,9 @@ export const viewport: Viewport = {
   themeColor: '#3B82F6',
 }
 
+import { SessionProvider } from "next-auth/react"
+import { AppProvider } from "@/lib/app-context"
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -22,7 +25,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased`}>{children}</body>
+      <body className={`${inter.variable} font-sans antialiased text-foreground bg-background`}>
+        <SessionProvider>
+          <AppProvider>
+            {children}
+          </AppProvider>
+        </SessionProvider>
+      </body>
     </html>
   )
 }

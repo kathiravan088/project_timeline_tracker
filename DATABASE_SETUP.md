@@ -28,7 +28,7 @@ DATABASE_URL="mysql://username:password@localhost:3306/project_tracker"
 
 Replace:
 - `username` - Your MySQL username (default: `root`)
-- `password` - kathir@20666350
+- `password` - kathir@20666350248
 - `localhost:3306` - 127.0.0.1:3306
 
 ### 3. Run Migrations

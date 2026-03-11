@@ -1,0 +1,15 @@
+{
+  "students": [],
+  "availableProjects": [
+    {
+      "id": 29,
+      "name": "Decentralized Identity Manager",
+      "guideName": "Prof. Miller (Faculty)"
+    },
+    {
+      "id": 30,
+      "name": "AR Navigation for Indoors",
+      "guideName": "Prof. Miller (Faculty)"
+    }
+  ]
+}

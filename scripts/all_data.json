@@ -1,0 +1,210 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Admin User",
+      "role": "ADMIN",
+      "email": "admin@example.com"
+    },
+    {
+      "id": 5,
+      "name": "Admin User",
+      "role": "ADMIN",
+      "email": "admin@trackflow.app"
+    },
+    {
+      "id": 6,
+      "name": "Regular User",
+      "role": "USER",
+      "email": "user@trackflow.app"
+    },
+    {
+      "id": 9,
+      "name": "John Doe",
+      "role": "USER",
+      "email": "student1@example.com"
+    },
+    {
+      "id": 10,
+      "name": "Jane Smith",
+      "role": "USER",
+      "email": "student2@example.com"
+    },
+    {
+      "id": 11,
+      "name": "Prof. Miller (Faculty)",
+      "role": "FACULTY",
+      "email": "faculty@example.com"
+    }
+  ],
+  "projects": [
+    {
+      "id": 1,
+      "name": "mini project",
+      "userId": 5,
+      "guideName": ""
+    },
+    {
+      "id": 2,
+      "name": "mini project",
+      "userId": 5,
+      "guideName": ""
+    },
+    {
+      "id": 4,
+      "name": "project timeline tracker",
+      "userId": 5,
+      "guideName": ""
+    },
+    {
+      "id": 5,
+      "name": "Team Infrastructure Upgrade",
+      "userId": 1,
+      "guideName": ""
+    },
+    {
+      "id": 6,
+      "name": "AI Chatbot System",
+      "userId": 9,
+      "guideName": ""
+    },
+    {
+      "id": 7,
+      "name": "E-commerce Platform",
+      "userId": 9,
+      "guideName": ""
+    },
+    {
+      "id": 8,
+      "name": "Health Monitoring App",
+      "userId": 10,
+      "guideName": ""
+    },
+    {
+      "id": 9,
+      "name": "Department Lab Manager",
+      "userId": 1,
+      "guideName": ""
+    },
+    {
+      "id": 10,
+      "name": "Cybersecurity Audit Tool",
+      "userId": 11,
+      "guideName": ""
+    },
+    {
+      "id": 11,
+      "name": "AI Chatbot System",
+      "userId": 9,
+      "guideName": ""
+    },
+    {
+      "id": 12,
+      "name": "E-commerce Platform",
+      "userId": 9,
+      "guideName": ""
+    },
+    {
+      "id": 13,
+      "name": "Health Monitoring App",
+      "userId": 10,
+      "guideName": ""
+    },
+    {
+      "id": 14,
+      "name": "Department Lab Manager",
+      "userId": 1,
+      "guideName": ""
+    },
+    {
+      "id": 15,
+      "name": "Cybersecurity Audit Tool",
+      "userId": 11,
+      "guideName": ""
+    },
+    {
+      "id": 16,
+      "name": "AI Chatbot System",
+      "userId": 9,
+      "guideName": ""
+    },
+    {
+      "id": 17,
+      "name": "E-commerce Platform",
+      "userId": 9,
+      "guideName": ""
+    },
+    {
+      "id": 18,
+      "name": "Health Monitoring App",
+      "userId": 10,
+      "guideName": ""
+    },
+    {
+      "id": 19,
+      "name": "Department Lab Manager",
+      "userId": 1,
+      "guideName": ""
+    },
+    {
+      "id": 20,
+      "name": "AI-Powered Smart Home",
+      "userId": 9,
+      "guideName": ""
+    },
+    {
+      "id": 21,
+      "name": "Blockchain Voting System",
+      "userId": 9,
+      "guideName": ""
+    },
+    {
+      "id": 22,
+      "name": "Virtual Reality Classroom",
+      "userId": 10,
+      "guideName": ""
+    },
+    {
+      "id": 23,
+      "name": "IoT Waste Management",
+      "userId": 10,
+      "guideName": ""
+    },
+    {
+      "id": 24,
+      "name": "Autonomous Delivery Drone",
+      "userId": 10,
+      "guideName": ""
+    },
+    {
+      "id": 25,
+      "name": "Deep Learning for Medical Imaging",
+      "userId": 10,
+      "guideName": ""
+    },
+    {
+      "id": 28,
+      "name": "Smart Agriculture System",
+      "userId": 6,
+      "guideName": "Prof. Miller (Faculty)"
+    },
+    {
+      "id": 29,
+      "name": "Decentralized Identity Manager",
+      "userId": null,
+      "guideName": "Prof. Miller (Faculty)"
+    },
+    {
+      "id": 30,
+      "name": "AR Navigation for Indoors",
+      "userId": null,
+      "guideName": "Prof. Miller (Faculty)"
+    },
+    {
+      "id": 31,
+      "name": "Smart Parking System",
+      "userId": null,
+      "guideName": "Prof. Miller (Faculty)"
+    }
+  ]
+}

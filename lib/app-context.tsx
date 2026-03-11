@@ -1,73 +1,65 @@
 "use client"
 
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react"
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react"
 import type { Project, User } from "./types"
+import { useSession, signIn, signOut } from "next-auth/react"
 
 interface AppContextType {
   user: User | null
   projects: Project[]
   isAuthenticated: boolean
+  isLoading: boolean
   login: (email: string, password: string) => Promise<boolean>
   logout: () => void
-  addProject: (project: Omit<Project, "id" | "createdAt">) => void
-  updateProjectStatus: (id: string, status: Project["status"]) => void
-  deleteProject: (id: string) => void
+  addProject: (project: Omit<Project, "id" | "createdAt">) => Promise<void>
+  updateProjectStatus: (id: string, status: Project["status"]) => Promise<void>
+  updateProject: (id: string, data: Partial<Project>) => Promise<void>
+  deleteProject: (id: string) => Promise<void>
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined)
 
-const DEMO_PROJECTS: Project[] = [
-  {
-    id: "1",
-    name: "Website Redesign",
-    description: "Redesign the company website with a modern, responsive layout and improved user experience.",
-    status: "in-progress",
-    fromDate: "2026-01-15",
-    toDate: "2026-03-30",
-    assignedEmail: "demo@trackflow.app",
-    createdAt: "2026-01-10T10:00:00Z",
-  },
-  {
-    id: "2",
-    name: "Mobile App Development",
-    description: "Build a cross-platform mobile application for customer engagement and notifications.",
-    status: "not-started",
-    fromDate: "2026-04-01",
-    toDate: "2026-08-15",
-    assignedEmail: "dev@trackflow.app",
-    createdAt: "2026-01-12T14:30:00Z",
-  },
-  {
-    id: "3",
-    name: "API Integration",
-    description: "Integrate third-party APIs for payment processing, analytics, and email services.",
-    status: "completed",
-    fromDate: "2025-11-01",
-    toDate: "2026-01-31",
-    assignedEmail: "demo@trackflow.app",
-    createdAt: "2025-10-28T09:15:00Z",
-  },
-]
-
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [projects, setProjects] = useState<Project[]>(DEMO_PROJECTS)
+  const { data: session, status } = useSession()
+  const [projects, setProjects] = useState<Project[]>([])
 
-  const isAuthenticated = user !== null
+  const user = session?.user ? {
+    id: (session.user as any).id || "unknown",
+    email: session.user.email!,
+    name: session.user.name!,
+    role: (session.user as any).role
+  } : null
 
-  const login = useCallback(async (email: string, _password: string) => {
+  const isAuthenticated = status === "authenticated"
+  const isLoading = status === "loading"
+
+  const fetchProjects = useCallback(async () => {
+    if (!isAuthenticated) return
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password: _password }),
+      const res = await fetch('/api/projects')
+      if (res.ok) {
+        const data = await res.json()
+        setProjects(data)
+      }
+    } catch (error) {
+      console.error("Failed to fetch projects", error)
+    }
+  }, [isAuthenticated])
+
+  useEffect(() => {
+    fetchProjects()
+    const interval = setInterval(fetchProjects, 30000) // Poll every 30s
+    return () => clearInterval(interval)
+  }, [fetchProjects])
+
+  const login = useCallback(async (email: string, password: string) => {
+    try {
+      const result = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
       })
-
-      if (!res.ok) return false
-
-      const data = await res.json()
-      setUser({ email: data.email, name: data.name })
-      return true
+      return !result?.error
     } catch (err) {
       console.error('Login failed', err)
       return false
@@ -75,27 +67,85 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const logout = useCallback(() => {
-    setUser(null)
+    signOut({ callbackUrl: "/" })
   }, [])
 
-  const addProject = useCallback((project: Omit<Project, "id" | "createdAt">) => {
-    const newProject: Project = {
-      ...project,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
+  const addProject = useCallback(async (project: Omit<Project, "id" | "createdAt">) => {
+    try {
+      const res = await fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...project, userId: (session?.user as any)?.id }),
+      })
+
+      if (res.ok) {
+        const newProject = await res.json()
+        setProjects((prev) => [newProject, ...prev])
+      }
+    } catch (error) {
+      console.error("Failed to add project", error)
     }
-    setProjects((prev) => [newProject, ...prev])
-  }, [])
+  }, [session])
 
-  const updateProjectStatus = useCallback((id: string, status: Project["status"]) => {
+  const updateProjectStatus = useCallback(async (id: string, status: Project["status"]) => {
+    // Optimistic update
     setProjects((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, status } : p))
+      prev.map((p) => (String(p.id) === String(id) ? { ...p, status } : p))
     )
-  }, [])
 
-  const deleteProject = useCallback((id: string) => {
-    setProjects((prev) => prev.filter((p) => p.id !== id))
-  }, [])
+    try {
+      // Ideally we would have a PATCH endpoint here, assuming one exists or using the store for now if not fully implemented in backend yet for status specifically.
+      // For now, let's assume we will implement the endpoint.
+      await fetch(`/api/projects/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      })
+    } catch (error) {
+      console.error("Failed to update status", error)
+      fetchProjects() // Revert on error
+    }
+  }, [fetchProjects])
+
+  const updateProject = useCallback(async (id: string, data: Partial<Project>) => {
+    // Optimistic update
+    setProjects((prev) =>
+      prev.map((p) => (String(p.id) === String(id) ? { ...p, ...data } : p))
+    )
+
+    try {
+      const res = await fetch(`/api/projects/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+
+      if (!res.ok) {
+        throw new Error('Failed to update project')
+      }
+
+      const updatedProject = await res.json()
+      // Update with actual data from server to ensure consistency
+      setProjects((prev) =>
+        prev.map((p) => (String(p.id) === String(id) ? updatedProject : p))
+      )
+    } catch (error) {
+      console.error("Failed to update project", error)
+      fetchProjects() // Revert on error
+    }
+  }, [fetchProjects])
+
+  const deleteProject = useCallback(async (id: string) => {
+    // Optimistic update
+    setProjects((prev) => prev.filter((p) => String(p.id) !== String(id)))
+
+    try {
+      await fetch(`/api/projects/${id}`, { method: 'DELETE' })
+    } catch (error) {
+      console.error("Failed to delete project", error)
+      fetchProjects()
+    }
+  }, [fetchProjects])
 
   return (
     <AppContext.Provider
@@ -103,10 +153,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
         user,
         projects,
         isAuthenticated,
+        isLoading,
         login,
         logout,
         addProject,
         updateProjectStatus,
+        updateProject,
         deleteProject,
       }}
     >

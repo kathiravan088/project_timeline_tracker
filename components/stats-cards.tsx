@@ -2,42 +2,73 @@
 
 import { useApp } from "@/lib/app-context"
 import { Card, CardContent } from "@/components/ui/card"
-import { FolderOpen, CircleDashed, Loader, CheckCircle2 } from "lucide-react"
+import { FolderOpen, CircleDashed, CheckCircle2, Users, Calendar, ClipboardCheck, Clock } from "lucide-react"
 
 export function StatsCards() {
-  const { projects } = useApp()
+  const { projects, user } = useApp()
 
-  const total = projects.length
-  const notStarted = projects.filter((p) => p.status === "not-started").length
-  const inProgress = projects.filter((p) => p.status === "in-progress").length
-  const completed = projects.filter((p) => p.status === "completed").length
+  const isFaculty = user?.role === "FACULTY" || user?.role === "ADMIN"
 
-  const stats = [
+  // Faculty Stats
+  const facultyStats = [
     {
       label: "Total Projects",
-      value: total,
+      value: projects.length,
       icon: FolderOpen,
       iconClassName: "text-primary bg-primary/10",
     },
     {
-      label: "Not Started",
-      value: notStarted,
-      icon: CircleDashed,
-      iconClassName: "text-muted-foreground bg-muted",
+      label: "Assigned Students",
+      value: projects.filter(p => !!p.userId).length,
+      icon: Users,
+      iconClassName: "text-success bg-success/10",
     },
     {
-      label: "In Progress",
-      value: inProgress,
-      icon: Loader,
+      label: "Upcoming Reviews",
+      value: projects.reduce((acc, p) => acc + (p.reviews?.filter(r => r.status === "scheduled").length || 0), 0),
+      icon: Calendar,
+      iconClassName: "text-warning bg-warning/10",
+    },
+    {
+      label: "Pending Approvals",
+      value: projects.filter(p => p.status === "pending").length,
+      icon: ClipboardCheck,
+      iconClassName: "text-info bg-info/10",
+    },
+  ]
+
+  // Student Stats
+  const studentProjects = projects.filter(p => p.userId === (user?.id ? parseInt(user.id) : null))
+  const currentProject = studentProjects[0]
+
+  const studentStats = [
+    {
+      label: "Your Projects",
+      value: studentProjects.length,
+      icon: FolderOpen,
       iconClassName: "text-primary bg-primary/10",
     },
     {
-      label: "Completed",
-      value: completed,
-      icon: CheckCircle2,
+      label: "Project Status",
+      value: currentProject?.status?.replace("-", " ") || "No Project",
+      icon: CircleDashed,
+      iconClassName: "text-warning bg-warning/10",
+    },
+    {
+      label: "Days Remaining",
+      value: currentProject ? Math.max(0, Math.ceil((new Date(currentProject.toDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))) : 0,
+      icon: Clock,
       iconClassName: "text-success bg-success/10",
     },
+    {
+      label: "Completed",
+      value: studentProjects.filter(p => p.status === "completed").length,
+      icon: CheckCircle2,
+      iconClassName: "text-info bg-info/10",
+    },
   ]
+
+  const stats = isFaculty ? facultyStats : studentStats
 
   return (
     <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">

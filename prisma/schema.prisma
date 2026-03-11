@@ -1,34 +1,122 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
- datasource db {
-  provider = "sqlite"
- }
-
-model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  password String
-  name  String
-  projects Project[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
-model Project {
-  id             Int     @id @default(autoincrement())
-  name           String
-  description    String  @db.Text
-  status         String  @default("not-started") // "not-started" | "in-progress" | "completed"
-  fromDate       String
-  toDate         String
-  assignedEmail  String
-  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId         Int
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+model dailylog {
+  id           Int         @id @default(autoincrement())
+  content      String      @db.Text
+  date         DateTime    @default(now())
+  projectId    Int
+  userId       Int
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime
+  teamMemberId Int?
+  project      project     @relation(fields: [projectId], references: [id], onDelete: Cascade, map: "DailyLog_projectId_fkey")
+  teammember   teammember? @relation(fields: [teamMemberId], references: [id], map: "DailyLog_teamMemberId_fkey")
+  user         user        @relation(fields: [userId], references: [id], onDelete: Cascade, map: "DailyLog_userId_fkey")
+
+  @@index([projectId], map: "DailyLog_projectId_fkey")
+  @@index([teamMemberId], map: "DailyLog_teamMemberId_fkey")
+  @@index([userId], map: "DailyLog_userId_fkey")
+}
+
+model project {
+  id              Int               @id @default(autoincrement())
+  name            String
+  description     String
+  status          String            @default("not-started")
+  fromDate        String
+  toDate          String
+  assignedEmail   String?
+  userId          Int?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime
+  assignedId      String?           @default("")
+  assignedName    String?           @default("")
+  maxStudents     Int?              @default(1)
+  technologies    String?           @default("")
+  guideName       String?           @default("")
+  dailylog        dailylog[]
+  user            user?             @relation(fields: [userId], references: [id], onDelete: Cascade, map: "Project_userId_fkey")
+  projectdocument projectdocument[]
+  projectreview   projectreview[]
+  srsdocument     srsdocument[]
+  teammember      teammember[]
+
+  @@index([userId], map: "Project_userId_fkey")
+}
+
+model projectdocument {
+  id           Int      @id @default(autoincrement())
+  templateName String
+  fileName     String
+  filePath     String
+  projectId    Int
+  uploadDate   DateTime @default(now())
+  updatedAt    DateTime
+  project      project  @relation(fields: [projectId], references: [id], onDelete: Cascade, map: "ProjectDocument_projectId_fkey")
+
+  @@index([projectId], map: "ProjectDocument_projectId_fkey")
+}
+
+model projectreview {
+  id         Int      @id @default(autoincrement())
+  reviewType String   @default("Review 1")
+  reviewDate DateTime
+  meetLink   String?
+  marks      String?
+  comments   String?  @db.Text
+  status     String   @default("scheduled")
+  projectId  Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime
+  result     String?
+  project    project  @relation(fields: [projectId], references: [id], onDelete: Cascade, map: "ProjectReview_projectId_fkey")
+
+  @@index([projectId], map: "ProjectReview_projectId_fkey")
+}
+
+model srsdocument {
+  id         Int      @id @default(autoincrement())
+  name       String
+  fileName   String
+  filePath   String
+  status     String   @default("pending")
+  comments   String?  @db.Text
+  projectId  Int
+  uploadDate DateTime @default(now())
+  updatedAt  DateTime
+  project    project  @relation(fields: [projectId], references: [id], onDelete: Cascade, map: "SrsDocument_projectId_fkey")
+
+  @@index([projectId], map: "SrsDocument_projectId_fkey")
+}
+
+model teammember {
+  id         Int        @id @default(autoincrement())
+  name       String
+  employeeId String
+  projectId  Int
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime
+  dailylog   dailylog[]
+  project    project    @relation(fields: [projectId], references: [id], onDelete: Cascade, map: "TeamMember_projectId_fkey")
+
+  @@index([projectId], map: "TeamMember_projectId_fkey")
+}
+
+model user {
+  id        Int        @id @default(autoincrement())
+  email     String     @unique(map: "User_email_key")
+  password  String
+  name      String
+  role      String     @default("USER")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime
+  dailylog  dailylog[]
+  project   project[]
 }
