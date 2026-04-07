@@ -18,21 +18,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Calendar, Mail, MoreVertical, Trash2, Clock, Users, FileText, Award, LayoutGrid, Folders, MessageSquareText, UserCog, Code } from "lucide-react"
+import { Calendar, Mail, MoreVertical, Trash2, Clock, Users, FileText, MessageSquareText, UserCog, Code } from "lucide-react"
 import { format, differenceInDays, parseISO, intervalToDuration, isPast } from "date-fns"
 import { useEffect, useState } from "react"
-import { DailyLogSection } from "./daily-log-section"
-import { SrsSection } from "./srs-section"
-import { ReviewSection } from "./review-section"
-import { DocumentSection } from "./document-section"
-import { TimelineSection } from "./timeline-section"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
 
 function getStatusConfig(status: ProjectStatus) {
   switch (status) {
@@ -348,116 +336,7 @@ export function ProjectCard({ project, isProposal = false }: { project: Project;
           </SelectContent>
         </Select>
 
-        {/* Action Sections */}
-        <div className="space-y-4 mt-6">
-          {/* Section: Project Management */}
-          <div className="space-y-2">
-            <h5 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1">Project Management</h5>
-            <div className="grid grid-cols-2 gap-2">
-              {/* Timeline Trigger */}
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="w-full gap-2 text-[11px] h-9 bg-primary/5 hover:bg-primary/10 border-primary/20 text-primary transition-all hover:scale-[1.02]">
-                    <LayoutGrid className="h-3.5 w-3.5" />
-                    Timeline & Schedule
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-2xl">
-                  <DialogHeader>
-                    <DialogTitle>{timeline.totalDays}-Day Project Timeline: {project.name}</DialogTitle>
-                    <p className="text-sm text-muted-foreground">Track your progress and upcoming milestones.</p>
-                  </DialogHeader>
-                  <div className="py-4">
-                    <TimelineSection project={project} />
-                  </div>
-                </DialogContent>
-              </Dialog>
-
-              {/* Daily Logs Trigger */}
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="w-full gap-2 text-[11px] h-9 bg-primary/5 hover:bg-primary/10 border-primary/20 text-primary transition-all hover:scale-[1.02]">
-                    <MessageSquareText className="h-3.5 w-3.5" />
-                    Daily Logs
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>Project Updates: {project.name}</DialogTitle>
-                    <p className="text-sm text-muted-foreground">View and post daily progress updates for this project.</p>
-                  </DialogHeader>
-                  <div className="py-4">
-                    <DailyLogSection projectId={project.id} />
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </div>
-
-          {/* Section: Submissions & Reviews */}
-          <div className="space-y-2">
-            <h5 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground px-1">Submissions & Reviews</h5>
-            <div className="grid grid-cols-2 gap-2">
-              {/* SRS Documents Trigger */}
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="w-full gap-2 text-[11px] h-9 bg-success/5 hover:bg-success/10 border-success/20 text-success transition-all hover:scale-[1.02]">
-                    <FileText className="h-3.5 w-3.5" />
-                    SRS Documents
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>SRS Document Management: {project.name}</DialogTitle>
-                    <p className="text-sm text-muted-foreground">Upload and review Software Requirement Specification documents.</p>
-                  </DialogHeader>
-                  <div className="py-4">
-                    <SrsSection projectId={project.id} />
-                  </div>
-                </DialogContent>
-              </Dialog>
-
-              {/* General Documents Trigger */}
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="w-full gap-2 text-[11px] h-9 bg-primary/5 hover:bg-primary/10 border-primary/20 text-primary transition-all hover:scale-[1.02]">
-                    <Folders className="h-3.5 w-3.5" />
-                    Project Docs
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-3xl">
-                  <DialogHeader>
-                    <DialogTitle>Project Document Library: {project.name}</DialogTitle>
-                    <p className="text-sm text-muted-foreground">Access all project-related templates, reports, and code files.</p>
-                  </DialogHeader>
-                  <div className="py-4">
-                    <DocumentSection projectId={project.id} />
-                  </div>
-                </DialogContent>
-              </Dialog>
-
-              {/* Reviews & Marks Trigger */}
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="w-full gap-2 text-[11px] h-9 bg-primary/5 hover:bg-primary/10 border-primary/20 text-primary transition-all hover:scale-[1.02] col-span-2 mt-1">
-                    <Award className="h-3.5 w-3.5" />
-                    View Reviews & Marks
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>Project Reviews & Marks: {project.name}</DialogTitle>
-                    <p className="text-sm text-muted-foreground">Schedule reviews, join meetings, and view awarded marks/feedback.</p>
-                  </DialogHeader>
-                  <div className="py-4">
-                    <ReviewSection projectId={project.id} />
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </div>
-        </div>
       </CardContent>
-    </Card >
+    </Card>
   )
 }
